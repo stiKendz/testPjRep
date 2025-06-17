@@ -31,6 +31,28 @@ header img {
     width: 100px;
     height: 100px;
 }
+header button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 270px;
+    min-height: 50px;
+
+    border: 0;
+    border-radius: 20px;
+
+    font-size: 20px;
+
+    background-color: #36ABFF;
+    color: white; 
+}
+    header button:hover,
+    header button:focus,
+    header button:active {
+        cursor: pointer;
+        transform: scale(1.04);
+        transition: 0.4s ease-out;
+    }
 footer {
     display: grid;
     grid-template-columns: auto;
@@ -50,6 +72,7 @@ footer {
     align-items: center;
 
     padding-top: 10px;
+    padding-bottom: 10px;
 }
 .main .buttons-container {
     display: flex;
