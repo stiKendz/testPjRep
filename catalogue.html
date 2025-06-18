@@ -31,5 +31,96 @@
         <h1>Москва 2025</h1>
     </footer>
     <script src="./main.js" defer></script>
+    <script>
+    async function loadOffers() {
+        try {
+            const response = await fetch('http://localhost:3000/getcatalogue', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            const offers = data.allOffers || [];
+            const container = document.querySelector('.user-offers-container');
+            
+            container.innerHTML = '';
+            
+            offers.forEach(offer => {
+                const offerElement = document.createElement('div');
+                offerElement.className = 'offer';
+                offerElement.innerHTML = `
+                    <img class="offer-image" src="./images/einkaufswagen.png" alt="Нет фотографии">
+                    <div class="name">${offer.name}</div>
+                    <div class="price">${offer.price} руб.</div>
+                    <input class="input-kolvo" type="number" min="1" placeholder="Введите количество товара">
+                    <input class="input-adress" type="text" placeholder="Введите адрес доставки">
+                    <button class="change-status-button" data-offer-id="${offer.offer_id}">Заказать</button>
+                `;
+                container.appendChild(offerElement);
+            });
+
+            document.querySelectorAll('.change-status-button').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const offerId = button.dataset.offerId;
+                    const quantityInput = button.parentElement.querySelector('.input-kolvo');
+                    const addressInput = button.parentElement.querySelector('.input-adress');
+                    
+                    const quantity = quantityInput.value;
+                    const address = addressInput.value;
+                    
+                    if (!quantity || !address) {
+                        alert('Пожалуйста, заполните количество и адрес доставки');
+                        return;
+                    }
+
+                    // Здесь нужно получить ID текущего пользователя
+                    // В реальном приложении он может быть из:
+                    // - localStorage после авторизации
+                    // - JWT токена
+                    // - Другого источника
+                    // Для примера возьмем userId = 1
+                    const userId = 1; // Замените на реальный ID пользователя
+                    
+                    try {
+                        const response = await fetch('http://localhost:3000/touserorders', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                userId: userId,
+                                offerId: offerId,
+                                quantity: quantity,
+                                address: address
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (response.ok) {
+                            alert('Товар успешно заказан!');
+                            // Можно обновить список заказов или выполнить другие действия
+                        } else {
+                            alert(`Ошибка: ${result.message}`);
+                        }
+                    } catch (error) {
+                        console.error('Ошибка при оформлении заказа:', error);
+                        alert('Произошла ошибка при оформлении заказа');
+                    }
+                });
+            });
+        } catch (error) {
+            console.error('Ошибка загрузки предложений:', error);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadOffers);
+    </script>
 </body>
 </html>

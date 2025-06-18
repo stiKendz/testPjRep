@@ -25,19 +25,40 @@ if (toSingupButton) {
 
 if (toCatalogueButton) {
     toCatalogueButton.addEventListener('click', () => {
-        window.location.href = './catalogue.html';
+        const token = window.localStorage.getItem('token');
+
+        if (!token) {
+            return alert('Вы не вошли в свой аккаунт');
+        } else {
+            window.location.href = './catalogue.html';
+        }
     });
 };
 
 if (toOffersButton) {
     toOffersButton.addEventListener('click', () => {
-        window.location.href = './offers.html';
+        const token = window.localStorage.getItem('token');
+
+        if (!token) {
+            return alert('Необходимо войти в аккаунт');
+        } else {
+            window.location.href = './offers.html';
+        }
     });
 };
 
 if (toAdminpageButton) {
     toAdminpageButton.addEventListener('click', () => {
-        window.location.href = './admin.html';
+        const token = window.localStorage.getItem('token');
+        const role = window.localStorage.getItem('role');
+
+        if (!token) {
+            return alert('Необходимо войти в аккаунт');
+        } else if (role !== 'Администратор') {
+            return alert('Вы не являетесь администратором')
+        } else {
+            window.location.href='./admin.html';
+        }
     });
 };
 

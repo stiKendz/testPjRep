@@ -143,3 +143,48 @@ app.post('/login', async (req, res) => {
         res.status(500).json({message: 'Произошла ошибка на сервере'});
     };
 });
+
+
+app.get('/getcatalogue', async (req, res) => {
+    try {
+        const client = await pool.connect();
+
+        try {
+            const response = await client.query(
+                'SELECT * FROM offers_table'
+            )
+
+            const result = response.rows;
+    
+            res.json({
+                allOffers: result
+            })
+        } catch (err) {
+            console.log(`Ошибка вывода всех товаров ${err.message}`);
+            res.status(500).json({message: 'Ошибка вывода всех товаров на стороне запроса'});
+        } finally {
+            client.release();
+        }
+    } catch (err) {
+        console.log(`Ошибка вывода всех товаров ${err.message}`);
+        res.status(500).json({message: 'Ошибка вывода всех товаров на стороне сервера'});
+    };
+});
+
+app.get('/touserorders', async(req, res) => {
+    try {
+        const client = await pool.connect();
+
+        try {
+            
+        } catch (err) {
+            console.log(`Ошибка заказа товара ${err.message}`);
+            res.status(500).json({message: 'Ошибка заказа товара на стороне запроса'});
+        } finally {
+            client.release();
+        }
+    } catch (err) {
+        console.log(`Ошибка заказа товара ${err.message}`);
+        res.status(500).json({message: 'Ошибка заказа товара на стороне сервера'});
+    };
+})
