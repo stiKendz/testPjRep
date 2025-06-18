@@ -11,7 +11,7 @@ CREATE TABLE users_table (
 
 CREATE TABLE roles_table (
 	role_id serial primary key,
-	role_name varchar(64) not null default 'user',
+	role_name varchar(64) not null default 'Пользователь',
 	user_id int unique, -- 1
 	foreign key (user_id) references users_table (user_id) on delete cascade on update cascade -- связь 1 к 1 users_table (user_id)
 );
@@ -28,6 +28,7 @@ CREATE TABLE users_offers (
 	offer_id int,
 	offer_kolvo int not null,
 	user_adress varchar(256) not null,
+	status varchar(64) not null default 'В обработке',
 	foreign key (user_id) references users_table (user_id) on delete cascade on update cascade,
 	foreign key (offer_id) references offers_table (offer_id) on delete cascade on update cascade,
 	primary key (user_id, offer_id)
@@ -62,6 +63,9 @@ INSERT INTO users_offers (user_id, offer_id, offer_kolvo, user_adress) VALUES
 (3, 4, 1, 'ул. Гагарина, д.5, кв.33'),
 (4, 5, 3, 'ул. Садовая, д.20, кв.7');
 
+SELECT * FROM users_table;
 SELECT * FROM roles_table;
+SELECT * FROM offers_table;
+SELECT * FROM users_offers;
 
-DELETE FROM users_table WHERE user_id = 7;
+DELETE FROM users_table WHERE user_id = 6;

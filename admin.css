@@ -85,6 +85,9 @@ footer {
     flex-wrap: wrap;
     gap: 10px 0px;
 
+    border: 0;
+    border-radius: 30px;
+
     background-color: #E6E6E6;
 }
     .main .user-offers-container .offer {
@@ -98,6 +101,9 @@ footer {
         height: 600px;
 
         margin: 10px;
+
+        border: 0;
+        border-radius: 20px;
 
         background-color: #36ABFF;
         color: white;

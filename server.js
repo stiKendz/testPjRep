@@ -59,6 +59,10 @@ app.post('/registration', async (req, res) => {
             if (exitingUser.rowCount > 0) {
                 return res.status(409).json({exitUserMessage: 'Пользователь с таким адресом электронной почты уже зарегистрирован'})
             }
+            const exitingUserLogin = await client.query('SELECT user_id FROM users_table WHERE email = $1', [email]);
+            if (exitingUserLogin.rowCount > 0) {
+                return res.status(409).json({exitUserLoginMessage: 'Введенный логин занят, придумайте другой'})
+            }
 
             const correctEmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
             if(!correctEmailRegex.test(email)) {
@@ -73,7 +77,7 @@ app.post('/registration', async (req, res) => {
 
             const userId = result.rows[0].user_id;
             if (login === 'sklad' && password === '123qwe') {
-                const role_name = 'admin';
+                const role_name = 'Администратор';
                 await client.query(
                     'INSERT INTO roles_table (role_name, user_id) VALUES ($1, $2)',
                     [role_name, userId]
@@ -103,4 +107,39 @@ app.post('/registration', async (req, res) => {
         console.error('Ошибка при регистрации пользователя:', err.message);
         res.status(500).json({message: 'Ошибка при регистрации пользователя из-зи ошибки на сервере'});
     }
+});
+
+app.post('/login', async (req, res) => {
+    const {login, password} = req.body;
+
+    if (!login || !password) {
+        return res.status(400).json({emptyInputErrorMessage: 'Все поля должны быть заполнены'});
+    };
+
+    try {
+        const result = await pool.query('SELECT * FROM users_table WHERE login = $1', [login]);
+        const user = result.rows[0];
+        if (!user) {
+                return res.status(401).json({failedLoginOrPasswordMessage: 'Неверный логин или пароль'});
+        }
+
+        const validPassword = bcrypt.compareSync(password, user.password);
+        if (!validPassword) {
+            return res.status(401).json({noValidPasswordMessage: 'Неверный логин или пароль'});
+        }
+
+        const roleSearch = await pool.query('SELECT * FROM roles_table WHERE user_id = $1', [user.user_id]);
+        const role = roleSearch.rows[0] ? roleSearch.rows[0].role_name : 'Пользователь'; 
+
+        const token = jwt.sign({
+            userId: user.user_id,
+            login: user.login,
+            role: role
+        }, SECRET_KEY);
+        res.json({token, login, role, successLoginMessage: `Вы успешно вошли в аккаунт как: ${role}`});
+        
+    } catch (err) {
+        console.error('Ошибка входа в аккаунт', err.message);
+        res.status(500).json({message: 'Произошла ошибка на сервере'});
+    };
 });

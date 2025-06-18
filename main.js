@@ -2,6 +2,7 @@ const toMainPageButton = document.querySelector('.to_main_page');
 const toSingginButton = document.querySelector('.singin');
 const toSingupButton = document.querySelector('.singup');
 const toOffersButton = document.querySelector('.offers');
+const toCatalogueButton = document.querySelector('.to-catalogue');
 const toAdminpageButton = document.querySelector('.adminpage');
 
 if (toMainPageButton) {
@@ -19,6 +20,12 @@ if (toSingginButton) {
 if (toSingupButton) {
     toSingupButton.addEventListener('click', () => {
         window.location.href = './singup.html';
+    });
+};
+
+if (toCatalogueButton) {
+    toCatalogueButton.addEventListener('click', () => {
+        window.location.href = './catalogue.html';
     });
 };
 
@@ -60,12 +67,57 @@ if (singUpButton) {
                 alert('Все поля должны быть заполнены');
             }
 
+            if (data.exitUserMessage) {
+                alert('Пользователь с таким адресом электронной почты уже зарегистрирован');
+            }
+
             if (data.errorEmailMessage) {
                 alert('Введите корректный адрес электронной почты');
             }
 
+            if (data.exitUserLoginMessage) {
+                alert('Введенный логин уже занят, придумайте другой');
+            }
+
             if (data.successRegistrationMessage) {
                 alert('Вы успешно зарегистрировались');
+            }
+    
+            console.log(data);
+        });
+    };
+
+
+const singInButton = document.querySelector('.singin-button');
+if (singInButton) {
+        singInButton.addEventListener('click', async () => {
+            const login = document.querySelector('.input-login').value;
+            const password = document.querySelector('.input-password').value;
+        
+            const response = await fetch('http://localhost:3000/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ login, password })
+            });
+        
+            const data = await response.json();
+
+            if (data.emptyInputErrorMessage) {
+                alert('Все поля должны быть заполнены');
+            }
+
+            if (data.failedLoginOrPasswordMessage || data.noValidPasswordMessage) {
+                alert('Неверный логин или пароль');
+            }
+
+            if (data.successLoginMessage) {
+                alert(data.successLoginMessage);
+
+                window.localStorage.setItem('token', data.token);
+                window.localStorage.setItem('login', data.login);
+                window.localStorage.setItem('role', data.role);
             }
     
             console.log(data);
